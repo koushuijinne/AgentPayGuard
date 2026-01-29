@@ -17,6 +17,8 @@
 | **使用指南** |
 | [TESTING_GUIDE.md](docs/guides/TESTING_GUIDE.md) | 🧪 完整的测试流程（5 个场景，干运行→链上） |
 | [ROLE_A_GUIDE.md](docs/guides/ROLE_A_GUIDE.md) | 🔗 多签部署指南（Gnosis Safe + TokenGuard） |
+| [ROLE_C_GUIDE.md](docs/guides/ROLE_C_GUIDE.md) | 🎬 前端编译指南（for_judge.md 填充 + 演示资料） |
+| [ROLE_D_GUIDE.md](docs/guides/ROLE_D_GUIDE.md) | 🎥 运营演示指南（PPT + 视频 + 讲稿） |
 | **参考文档** |
 | [ARCHITECTURE.md](docs/reference/ARCHITECTURE.md) | 🏗️ 系统架构与设计决策 |
 | [allocation.md](docs/reference/allocation.md) | 👥 角色分工与交付物清单 |
