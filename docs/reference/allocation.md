@@ -22,49 +22,55 @@
 
 ---
 
-角色 B：后端（支付执行/AA 集成/链上交互）--Sulla
+角色 B：后端（支付执行/AA 集成/链上交互/现场演讲）--Sulla
 
 - 负责内容：
   - Kite AA SDK（`gokite-aa-sdk`）集成：`PAYMENT_MODE=aa` 跑通 userOp
   - 稳定币支付执行（测试网转账）跑通并产出 tx hash（`PAYMENT_MODE=eoa` 或 `aa` 均可）
   - （如需要网页/服务）提供最小 API：`POST /pay`、`POST /policy/validate`（可选）
-- **已交付给 C 的内容**：
+  - **现场演讲**：准备 5-10 分钟的讲稿，展示代码、干运行、链上验证、系统架构
+- **交付给 C 的内容**：
   - ✅ `src/lib/kite-aa.ts` (104 行) - 完整的 ERC-4337 UserOperation 支付流程
   - ✅ `src/lib/policy.ts` - 权限规则引擎（白名单/单笔上限/日限额）
   - ✅ `pnpm demo:pay` - 正常支付演示脚本（输出：通过策略校验）
   - ✅ `pnpm demo:reject` - 异常拒绝演示脚本（输出：NOT_IN_ALLOWLIST）
-  - ✅ `src/demo-pay.ts` + `src/demo-reject.ts` 源码（供截图讲解）
+  - ✅ `src/demo-pay.ts` + `src/demo-reject.ts` 源码（供讲解）
   - ✅ `.env.example` - 环境变量占位符清单
   - ✅ `pnpm typecheck` 通过（0 errors）
+  - ✅ 支付 Tx Hash（EOA + AA）
+  - ✅ 演讲讲稿（可对照 Role D 之前的讲稿模板）
 - **需要 A 补充的内容**：
-  - 多签地址与冻结/解冻 Tx Hash（用于完整演示风控链路）
-- **C 需要用来填充 for_judge.md 的内容**：
-  - B 的支付 Tx Hash（`EXECUTE_ONCHAIN=1 pnpm demo:pay` 后得到）
-  - A 的冻结 Tx Hash
+  - 多签地址与冻结/解冻 Tx Hash（用于演讲中演示风控链路）
 
 ---
 
-角色 C：前端 / 体验与可复现（默认：演示与工程整合）
+角色 C：前端开发（Web UI + 可视化）⭐ **升级版**
 
-- 负责内容（无网页时）：
-  - 策略/风控逻辑（白名单/单笔上限/日限额）与拒绝路径：`pnpm demo:reject`
-  - README 一键复现、录屏脚本、截图证据整理
-  - `for_judge.md`：把 tx hash/证据路径填满，保证评委 1 分钟能判定达标
-- 负责内容（有网页时，可选升级）：
-  - 做一个最小 Web UI：配置策略 → 发起支付 → 展示 tx hash / 拒绝原因
+- 负责内容（必需）：
+  - **Web UI 开发**：科技感强的支付界面（React + Tailwind + Framer Motion）
+    - 支付操作面板（深色主题 + 动画反馈）
+    - 策略校验可视化（进度条 + 即时反馈）
+    - 多签冻结面板（权限透视 + 时间线）
+    - （可选）流程架构展示（SVG 或 Three.js 动画）
+  - **数据展示**：
+    - 实时 Tx 状态轮询和更新
+    - 策略规则可视化（白名单、限额、有效期）
+    - 拒绝演示（非白名单地址抖动 + 红色提示）
+  - **最终演示**：截图或视频展示 Web UI 的完整流程
+- **交付给 for_judge.md 的内容**：
+  - 支付 Tx Hash + 浏览器链接（来自 B）
+  - AA Tx Hash + 浏览器链接（来自 B）
+  - 冻结 Tx Hash + 多签地址（来自 A）
+  - Web UI 截图或演示视频（展示所有 4 个赛道要求）
 - **已获得的交付物**：
-  - ✅ 来自 B：`pnpm demo:pay` / `pnpm demo:reject` 脚本 + 源码
-  - ✅ 来自 B：`src/lib/policy.ts` 权限规则
-  - ✅ 待补充自 A：冻结 Tx Hash
+  - ✅ 来自 B：代码实现 + 演示脚本
   - ✅ 待补充自 B：支付 Tx Hash（EXECUTE_ONCHAIN=1 后）
-- **需要完成的**：
-  - 填充 `for_judge.md` 第一个表格（赛道要求对照）：
-    - 链上支付 → Tx Hash：`0xTODO_PAYMENT_TX_HASH`（来自 B）
-    - Agent 身份 → Kite AA SDK 集成说明
-    - 权限控制 → 拒绝案例截图 + 冻结 Tx Hash（来自 A）
-    - 可复现性 → `pnpm demo:pay/reject` 命令
-  - 制作演示视频或截图（5 分钟流程：代码 → 正常 → 拒绝 → 证据表）
-  - 列出所有 Tx Hash 和证据路径供 D（PPT/视频）使用
+  - ✅ 待补充自 A：冻结 Tx Hash + 多签地址
+- **技术栈推荐**：
+  - React 18 + TypeScript + Tailwind CSS + Vite
+  - 动画库：Framer Motion（流畅的交互动画）
+  - 实时状态：TanStack Query（Tx 轮询）
+  - 可选图表：ECharts 或 Chart.js
 
 ---
 
