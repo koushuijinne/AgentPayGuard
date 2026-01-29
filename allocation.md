@@ -10,10 +10,14 @@
   - Kite 多签钱包（Ash Wallet）创建/配置（2/3 或 3/5）与操作流程
   - （可选）策略合约/Guard 合约：冻结/解冻/策略更新的权限边界
   - 链上部署、合约地址、浏览器证据收集
-- 交付物：
-  - 多签地址、成员地址、阈值配置截图/链接
-  - （如有合约）合约地址/ABI/部署脚本
-  - 关键交易示例：冻结/解冻/策略更新（tx hash）
+- **交付给 C 的内容**：
+  - 多签钱包地址（供 `for_judge.md` 作证据）
+  - 成员清单与阈值配置（截图/Tx链接）
+  - 冻结操作 Tx Hash：`0xTODO_FREEZE_TX_HASH`（用于演示"高风险事件 → 多签介入"）
+  - 解冻操作 Tx Hash：`0xTODO_UNFREEZE_TX_HASH`（用于演示"风险恢复"）
+- **交付给 B 的内容**：
+  - 多签地址（如B需要在 AA 流程中调用多签冻结接口）
+  - 冻结/解冻/策略更新的合约ABI与函数签名
 
 ---
 
@@ -23,9 +27,19 @@
   - Kite AA SDK（`gokite-aa-sdk`）集成：`PAYMENT_MODE=aa` 跑通 userOp
   - 稳定币支付执行（测试网转账）跑通并产出 tx hash（`PAYMENT_MODE=eoa` 或 `aa` 均可）
   - （如需要网页/服务）提供最小 API：`POST /pay`、`POST /policy/validate`（可选）
-- 交付物：
-  - `pnpm demo:pay` 可输出真实 `txHash`（或 AA `userOpHash` + status）
-  - `.env.example` / README 中关键变量清单可用（token 地址、RPC、bundler 等）
+- **已交付给 C 的内容**：
+  - ✅ `src/lib/kite-aa.ts` (104 行) - 完整的 ERC-4337 UserOperation 支付流程
+  - ✅ `src/lib/policy.ts` - 权限规则引擎（白名单/单笔上限/日限额）
+  - ✅ `pnpm demo:pay` - 正常支付演示脚本（输出：通过策略校验）
+  - ✅ `pnpm demo:reject` - 异常拒绝演示脚本（输出：NOT_IN_ALLOWLIST）
+  - ✅ `src/demo-pay.ts` + `src/demo-reject.ts` 源码（供截图讲解）
+  - ✅ `.env.example` - 环境变量占位符清单
+  - ✅ `pnpm typecheck` 通过（0 errors）
+- **需要 A 补充的内容**：
+  - 多签地址与冻结/解冻 Tx Hash（用于完整演示风控链路）
+- **C 需要用来填充 for_judge.md 的内容**：
+  - B 的支付 Tx Hash（`EXECUTE_ONCHAIN=1 pnpm demo:pay` 后得到）
+  - A 的冻结 Tx Hash
 
 ---
 
@@ -37,10 +51,31 @@
   - `for_judge.md`：把 tx hash/证据路径填满，保证评委 1 分钟能判定达标
 - 负责内容（有网页时，可选升级）：
   - 做一个最小 Web UI：配置策略 → 发起支付 → 展示 tx hash / 拒绝原因
-- 交付物：
-  - `pnpm demo:reject` 输出明确拒绝原因（错误码/原因）
-  - 演示材料：视频/截图/可复现步骤
-  - `for_judge.md` 占位全部填满（tx hash、证据路径）
+- **已获得的交付物**：
+  - ✅ 来自 B：`pnpm demo:pay` / `pnpm demo:reject` 脚本 + 源码
+  - ✅ 来自 B：`src/lib/policy.ts` 权限规则
+  - ✅ 待补充自 A：冻结 Tx Hash
+  - ✅ 待补充自 B：支付 Tx Hash（EXECUTE_ONCHAIN=1 后）
+- **需要完成的**：
+  - 填充 `for_judge.md` 第一个表格（赛道要求对照）：
+    - 链上支付 → Tx Hash：`0xTODO_PAYMENT_TX_HASH`（来自 B）
+    - Agent 身份 → Kite AA SDK 集成说明
+    - 权限控制 → 拒绝案例截图 + 冻结 Tx Hash（来自 A）
+    - 可复现性 → `pnpm demo:pay/reject` 命令
+  - 制作演示视频或截图（5 分钟流程：代码 → 正常 → 拒绝 → 证据表）
+  - 列出所有 Tx Hash 和证据路径供 D（PPT/视频）使用
+
+---
+
+## 📦 交接总表（关键证据）
+
+| 证据项 | 来源 | 接收方 | 用途 | 状态 |
+|:---|:---|:---|:---|:---|
+| 支付 Tx Hash | B（支付执行） | C | 填充 for_judge.md 第一行 | 待 EXECUTE_ONCHAIN=1 |
+| 冻结 Tx Hash | A（多签操作） | C | 填充 for_judge.md 权限控制行 | 待交付 |
+| 代码实现 | B | C/D | 截图讲解 + PPT | ✅ 已交付 |
+| 权限规则 | B | C | 拒绝演示证据 | ✅ 已交付 |
+| 多签地址 | A | B/C | 权限管理入口 + 证据 | 待交付 |
 
 ---
 
