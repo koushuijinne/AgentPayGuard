@@ -7,17 +7,18 @@
 角色 A：链上（合约/多签）
 
 - 负责内容：
-  - Kite 多签钱包（Ash Wallet）创建/配置（2/3 或 3/5）与操作流程
-  - （可选）策略合约/Guard 合约：冻结/解冻/策略更新的权限边界
+  - Kite 多签钱包（如：Ash Wallet 或 Gnosis Safe）创建/配置（2/3 或 3/5 多签）与操作流程
+  - 冻结操作演示：部署权限管理合约或通过多签执行冻结交易（暂停 AA 账户的 ERC-20 转账能力）
   - 链上部署、合约地址、浏览器证据收集
+  - 参考文档：[ROLE_A_GUIDE.md](ROLE_A_GUIDE.md)
 - **交付给 C 的内容**：
   - 多签钱包地址（供 `for_judge.md` 作证据）
-  - 成员清单与阈值配置（截图/Tx链接）
-  - 冻结操作 Tx Hash：`0xTODO_FREEZE_TX_HASH`（用于演示"高风险事件 → 多签介入"）
-  - 解冻操作 Tx Hash：`0xTODO_UNFREEZE_TX_HASH`（用于演示"风险恢复"）
+  - 成员清单与阈值配置（截图/Tx链接，验证多签有效性）
+  - 冻结操作 Tx Hash：`0xTODO_FREEZE_TX_HASH`（用于演示"高风险事件 → 多签介入" → AA 账户被暂停）
+  - （可选）解冻操作 Tx Hash：`0xTODO_UNFREEZE_TX_HASH`（用于演示"风险恢复"）
 - **交付给 B 的内容**：
-  - 多签地址（如B需要在 AA 流程中调用多签冻结接口）
-  - 冻结/解冻/策略更新的合约ABI与函数签名
+  - 多签地址（B 可在 AA 流程中集成，或作为独立风控演示）
+  - 冻结/解冻的合约地址、ABI 与函数签名（用于 B 理解权限模型）
 
 ---
 
@@ -69,21 +70,34 @@
 
 ## 📦 交接总表（关键证据）
 
-| 证据项 | 来源 | 接收方 | 用途 | 状态 |
-|:---|:---|:---|:---|:---|
-| 支付 Tx Hash | B（支付执行） | C | 填充 for_judge.md 第一行 | 待 EXECUTE_ONCHAIN=1 |
-| 冻结 Tx Hash | A（多签操作） | C | 填充 for_judge.md 权限控制行 | 待交付 |
-| 代码实现 | B | C/D | 截图讲解 + PPT | ✅ 已交付 |
-| 权限规则 | B | C | 拒绝演示证据 | ✅ 已交付 |
-| 多签地址 | A | B/C | 权限管理入口 + 证据 | 待交付 |
+| 证据项 | 来源 | 接收方 | 用途 | 状态 | 指南 |
+|:---|:---|:---|:---|:---|:---|
+| 支付 Tx Hash (EOA) | B | C | 填充 for_judge.md 支付行 | 🟡 待 EXECUTE_ONCHAIN=1 | [TESTING_GUIDE.md](TESTING_GUIDE.md#场景-3-真实-eoa-支付-链上执行) |
+| 支付 Tx Hash (AA) | B | C | 填充 for_judge.md Agent身份行 | 🟡 待 EXECUTE_ONCHAIN=1 | [TESTING_GUIDE.md](TESTING_GUIDE.md#场景-4-真实-aa-支付-链上执行) |
+| 冻结 Tx Hash | A | C | 填充 for_judge.md 权限控制行 | 🔴 未开始 | [ROLE_A_GUIDE.md](ROLE_A_GUIDE.md) |
+| 代码实现 | B | C/D | 截图讲解 + PPT | ✅ 已交付 | [src/lib/kite-aa.ts](src/lib/kite-aa.ts#L1-L50) |
+| 权限规则 | B | C | 拒绝演示证据 | ✅ 已交付 | [src/lib/policy.ts](src/lib/policy.ts) |
+| 多签地址 | A | B/C | 权限管理入口 + 证据 | 🔴 未开始 | [ROLE_A_GUIDE.md](ROLE_A_GUIDE.md) |
 
 ---
 
-接口约定（避免互相阻塞）
+## 交互约定（确保不互相阻塞）
 
-- B → A：多签/合约的操作接口与权限说明（冻结/解冻/策略更新的具体入口）
-- A → B/C：链 ID、合约/多签地址、ABI、成员地址与阈值（用于展示/集成）
-- C → B：策略配置格式（JSON/TS/ENV）与错误码规范（用于前端/日志/演示一致）
+### B 不依赖 A
+- **独立性**：B 的 `pnpm demo:pay` 和 `pnpm demo:reject` 不需要 A 的多签地址
+- **原因**：B 演示的是"基础支付 + 策略"，多签冻结是"风控增强层"
+- **进度**：B 可独立完成 EXECUTE_ONCHAIN=1 并获得 Tx Hash
+
+### A → B/C（可选集成）
+- **交付内容**：多签地址、冻结函数 ABI、成员列表
+- **B 使用方式**：（可选）在政策拒绝时调用多签冻结接口
+- **C 使用方式**：（必需）在 for_judge.md "权限控制"行展示冻结 Tx Hash
+
+### C 的聚合任务（最后完成）
+- **输入源**：
+  - B 的两个 Tx Hash（EOA + AA），来自 EXECUTE_ONCHAIN=1 执行
+  - A 的冻结 Tx Hash，来自多签操作
+- **输出**：`for_judge.md` 表格全填 + 演示视频截图 + 证据索引
 
 ---
 
@@ -94,9 +108,10 @@
 - 负责内容：
   - PPT 设计与排版（封面/目录/架构图/流程图/亮点页/对照表页）
   - Demo 视频剪辑（1-3 分钟版本 + 10-30 秒高能版本），加字幕/高亮
-  - 证据材料整理：tx hash、截图、日志输出、链接汇总到 `docs/`（或统一文档）
-  - 现场演示“讲稿”与时间轴（每一步该说什么、该切哪个画面）
+  - 证据材料整理：tx hash、截图、日志输出、链接汇总到 `docs/` 或 [FINAL_DELIVERY_CHECKLIST.md](FINAL_DELIVERY_CHECKLIST.md)
+  - 现场演示"讲稿"与时间轴（每一步该说什么、该切哪个画面）
 - 交付物（可验收）：
   - `pitch_deck.pdf`（或 `pptx`）一份：10-12 页（问题/方案/MVP/对齐 Kite/ demo/证据/路线图）
+  - 参考交付清单：[FINAL_DELIVERY_CHECKLIST.md](FINAL_DELIVERY_CHECKLIST.md)
   - `demo_video.mp4`：1-3 分钟（含字幕与关键画面标注）
   - “证据索引页”：一页表格列出所有 tx hash、合约/多签地址、文档链接与截图位置
