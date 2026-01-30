@@ -7,6 +7,7 @@
   "scripts": {
     "demo:pay": "tsx src/demo-pay.ts",
     "demo:reject": "tsx src/demo-reject.ts",
+    "demo:freeze": "tsx src/test-freeze.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

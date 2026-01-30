@@ -245,6 +245,31 @@ pnpm demo:reject
 
 ---
 
+### 场景 6: 链上冻结验证 (Strong Dependency)
+
+验证后端策略能否正确读取链上合约状态并拦截支付。
+
+```bash
+pnpm demo:freeze
+```
+
+**预期输出**:
+```
+--- AgentPayGuard demo:freeze ---
+network: { rpc: '...', chainId: 2368 }
+contract: 0x3168a2307a3c272ea6CE2ab0EF1733CA493aa719
+target: 0xb89Ffb647Bc1D12eDcf7b0C13753300e17F2d6e9
+[REJECT] 拦截成功！
+[RECIPIENT_FROZEN] 收款地址已被多签冻结：0xb89F...
+[SUCCESS] 链上冻结风控生效 ✅
+```
+
+**注意**:
+- 如果输出 `[PASS]`，说明目标地址当前未被冻结。请联系 Role A 执行冻结操作。
+- 如果输出 `[ERROR]`，可能是网络连接问题。
+
+---
+
 ## 测试结果矩阵
 
 | 场景 | 命令 | 目标 | 预期结果 | 状态 |

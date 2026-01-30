@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | 链上支付 | 完成 1 笔测试网稳定币转账（由 Agent 触发） | **Tx Hash**：`0x5a8c9e2d3b1f4a6c8e2d9b1c3e5f7a9c1b3d5e7f9a1b3c5d7e9f1a3b5c7d9e1f` |
 | Agent 身份 | 使用 Kite 的 Agent/Passport（或官方身份体系）生成/绑定 Agent 身份 | 日志/截图：`docs/` 或演示视频 |
-| 权限控制 | 至少 1 条可验证的支付规则（如白名单/限额/有效期）在支付前被强制校验 + 自研 2/3 多签冻结功能 | `Policy` 配置 + 拒绝案例 + 多签冻结 Tx: `https://testnet.kitescan.ai/tx/0xab40fc72ea1fa30a6455b48372a02d25e67952ab7c69358266f4d83413bfa46c` |
+| 权限控制 | 至少 1 条可验证的支付规则（如白名单/限额/有效期）在支付前被强制校验 + **实时链上冻结检查（强依赖模式）** | `Policy` 配置 + 拒绝案例 + 多签冻结 Tx: `https://testnet.kitescan.ai/tx/0xab40fc72ea1fa30a6455b48372a02d25e67952ab7c69358266f4d83413bfa46c` |
 | 可复现性 | 提供完整运行说明，一键跑通 “创建 Agent → 发起支付 → 成功到账/被拒绝” | `README.md` / 本文“运行与复现” |
 
 ---

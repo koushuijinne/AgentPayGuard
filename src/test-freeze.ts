@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { loadEnv } from './lib/config.js';
-import { evaluatePolicy, normalizeAddresses } from './lib/policy.js';
+import { evaluatePolicy } from './lib/policy.js';
 
 async function main() {
   const env = loadEnv();
@@ -9,38 +9,47 @@ async function main() {
   // 冻结合约地址（来自 Role A 交付）
   const FREEZE_CONTRACT = '0x3168a2307a3c272ea6CE2ab0EF1733CA493aa719';
   
-  // 测试目标：使用 Owner 2 地址（Role A 文档提到它可能被用于测试冻结，或者我们假设它被冻结）
-  // 注意：如果 Owner 2 实际上没被冻结，这个脚本会返回 OK。
-  // 为了测试 REJECT，我们需要确认一个真正被冻结的地址。
-  // 这里我们先测试机制是否跑通（即是否真的去查了链）。
-  const targetAddress = '0xb89Ffb647Bc1D12eDcf7b0C13753300e17F2d6e9'; // Owner 2
+  // 测试目标：使用 Owner 2 地址（Role A 文档提到它可能被用于测试冻结）
+  // 该地址在 Role A 的交付文档中标记为 "Owner 2"，并用于冻结演示
+  const targetAddress = '0xb89Ffb647Bc1D12eDcf7b0C13753300e17F2d6e9'; 
 
-  console.log('--- 测试链上冻结检查 ---');
-  console.log('RPC:', env.RPC_URL);
-  console.log('Freeze Contract:', FREEZE_CONTRACT);
-  console.log('Checking Target:', targetAddress);
+  console.log('--- AgentPayGuard demo:freeze ---');
+  console.log('network:', { rpc: env.RPC_URL, chainId: env.CHAIN_ID });
+  console.log('contract:', FREEZE_CONTRACT);
+  console.log('target:', targetAddress);
 
   const policy = {
-    allowlist: [targetAddress], // 故意把它加到白名单，看是否会被冻结拦截
+    allowlist: [targetAddress], // 故意加到白名单，测试是否被链上拦截
     maxAmount: ethers.parseEther('100'),
   };
 
-  const decision = await evaluatePolicy({
-    policy,
-    recipient: targetAddress,
-    amount: ethers.parseEther('1'),
-    provider,
-    freezeContractAddress: FREEZE_CONTRACT
-  });
+  try {
+    const decision = await evaluatePolicy({
+      policy,
+      recipient: targetAddress,
+      amount: ethers.parseEther('1'),
+      provider,
+      freezeContractAddress: FREEZE_CONTRACT
+    });
 
-  if (decision.ok) {
-    console.log('[PASS] 地址未被冻结，允许支付。');
-    console.log('(注：如果该地址本应被冻结但通过了，请检查合约状态)');
-  } else {
-    console.log('[REJECT] 拦截成功！');
-    console.log('Code:', decision.code);
-    console.log('Message:', decision.message);
+    if (decision.ok) {
+      console.log('[PASS] 地址未被冻结，允许支付。');
+      console.log('注意：这说明该地址目前状态为 Unfrozen。如需测试拦截，请联系 Role A 冻结此地址。');
+    } else {
+      console.log('[REJECT] 拦截成功！');
+      console.log(`[${decision.code}] ${decision.message}`);
+      
+      if (decision.code === 'RECIPIENT_FROZEN') {
+        console.log('[SUCCESS] 链上冻结风控生效 ✅');
+      }
+    }
+  } catch (error: any) {
+    console.error('[ERROR] 检查过程发生错误:', error.message);
+    process.exitCode = 1;
   }
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});
