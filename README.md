@@ -1,5 +1,7 @@
 # AgentPayGuard：AI Agent 智能支付系统
 
+**项目描述**：AgentPayGuard 是一个面向 AI Agent 的链上支付权限与风控系统，让 AI Agent 在执行链上稳定币支付时，具备可验证身份、可编程权限、可审计记录、可阻断异常的最小闭环。系统支持自然语言支付请求解析、智能风险评估、AI增强策略和端到端的链上执行工作流。
+
 本仓库提供一个**可复现的 AI Agent 支付系统**，用于 Kite Payment Track：
 
 - **🤖 AI Agent 核心**：支持自然语言支付请求解析和智能风险评估
