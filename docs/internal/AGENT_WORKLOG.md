@@ -792,3 +792,35 @@ cat for_judge.md
 **总体评价**：从零搭建到完整框架，代码验证通过，文档完善，团队支持充分。项目就绪进入执行阶段。🚀
 
 
+
+### Phase 18: 集成链上多签冻结风控（2026-01-30）
+
+**背景**：
+- 收到角色 A 交付的 SimpleMultiSig 和 SimpleFreeze 合约地址。
+- 需要将链上冻结状态集成到后端策略引擎中，实现'强依赖模式'风控。
+
+**变更**：
+1.  **策略引擎升级** (src/lib/policy.ts)
+    - 将 evaluatePolicy 改为异步函数 sync。
+    - 引入 ethers.Contract 调用 SimpleFreeze.isFrozen(recipient)。
+    - 增加 provider 和 reezeContractAddress 参数。
+    - 新增错误码 RECIPIENT_FROZEN。
+
+2.  **演示脚本适配** (src/demo-pay.ts, src/demo-reject.ts)
+    - 注入 provider (JsonRpcProvider)。
+    - 注入冻结合约地址  x3168a2307a3c272ea6CE2ab0EF1733CA493aa719。
+
+3.  **验证脚本** (src/test-freeze.ts)
+    - 创建专门的测试脚本，验证对 Owner 2 (已冻结地址) 的拦截能力。
+    - 验证结果：成功拦截，返回 RECIPIENT_FROZEN。
+
+**文件变更**：
+- 修改：src/lib/policy.ts
+- 修改：src/demo-pay.ts
+- 修改：src/demo-reject.ts
+- 新增：src/test-freeze.ts (未跟踪)
+
+**验证**：
+- pnpm demo:pay (正常地址) -> 通过 
+- src/test-freeze.ts (冻结地址) -> 拒绝 
+

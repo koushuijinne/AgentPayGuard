@@ -8,7 +8,7 @@ export type Policy = {
 
 export type PolicyDecision =
   | { ok: true }
-  | { ok: false; code: 'NOT_IN_ALLOWLIST' | 'AMOUNT_EXCEEDS_MAX' | 'DAILY_LIMIT_EXCEEDED'; message: string };
+  | { ok: false; code: 'NOT_IN_ALLOWLIST' | 'AMOUNT_EXCEEDS_MAX' | 'DAILY_LIMIT_EXCEEDED' | 'RECIPIENT_FROZEN'; message: string };
 
 export function normalizeAddresses(addrs: string[]): string[] {
   return addrs
@@ -17,15 +17,21 @@ export function normalizeAddresses(addrs: string[]): string[] {
     .map((a) => ethers.getAddress(a));
 }
 
-export function evaluatePolicy(args: {
+// SimpleFreeze contract ABI (minimal)
+const FREEZE_ABI = ['function isFrozen(address account) view returns (bool)'];
+
+export async function evaluatePolicy(args: {
   policy: Policy;
   recipient: string;
   amount: bigint;
   spentToday?: bigint; // in token units
-}): PolicyDecision {
+  provider?: ethers.Provider; // Optional: needed for on-chain freeze check
+  freezeContractAddress?: string; // Optional: address of the freeze contract
+}): Promise<PolicyDecision> {
   const recipient = ethers.getAddress(args.recipient);
-  const { policy, amount } = args;
+  const { policy, amount, provider, freezeContractAddress } = args;
 
+  // 1. Check Allowlist
   if (policy.allowlist && policy.allowlist.length > 0) {
     const ok = policy.allowlist.some((a) => ethers.getAddress(a) === recipient);
     if (!ok) {
@@ -37,6 +43,27 @@ export function evaluatePolicy(args: {
     }
   }
 
+  // 2. Check On-chain Freeze Status (Strong Consistency)
+  if (provider && freezeContractAddress) {
+    try {
+      const freezeContract = new ethers.Contract(freezeContractAddress, FREEZE_ABI, provider);
+      const isFrozen: boolean = await freezeContract.isFrozen(recipient);
+      
+      if (isFrozen) {
+        return {
+          ok: false,
+          code: 'RECIPIENT_FROZEN',
+          message: `收款地址已被多签冻结：${recipient}`
+        };
+      }
+    } catch (error: any) {
+      // In Strong Consistency mode, we fail if we can't verify status
+      console.error('[Policy] Failed to check freeze status:', error);
+      throw new Error(`策略校验失败：无法验证链上冻结状态 (${error.message})`);
+    }
+  }
+
+  // 3. Check Max Amount
   if (policy.maxAmount !== undefined && amount > policy.maxAmount) {
     return {
       ok: false,

@@ -26,11 +26,17 @@ async function main() {
   };
 
   const spentToday = await readSpentToday(env.STATE_PATH);
-  const decision = evaluatePolicy({
+  
+  // Role B Integration: Check on-chain freeze status
+  const FREEZE_CONTRACT = '0x3168a2307a3c272ea6CE2ab0EF1733CA493aa719';
+
+  const decision = await evaluatePolicy({
     policy,
     recipient: badRecipient,
     amount,
-    spentToday
+    spentToday,
+    provider,
+    freezeContractAddress: FREEZE_CONTRACT
   });
 
   console.log('--- AgentPayGuard demo:reject ---');
