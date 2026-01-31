@@ -48,6 +48,37 @@
 
 ---
 
+## 子模块（前端）
+
+本仓库包含 **frontend** 子模块（Web UI，独立仓库）。新成员克隆主仓后必须初始化子模块，否则 `frontend/` 目录会是空的。
+
+### 克隆主仓后初始化子模块
+
+```bash
+git clone <主仓 URL>
+cd AgentPayGuard
+git submodule update --init --recursive
+```
+
+执行后 `frontend/` 下会有前端代码，可进入 `frontend/` 使用 `npm i` 和 `npm run dev` 单独运行前端。
+
+### 更新子模块到远程最新
+
+在主仓根目录执行：
+
+```bash
+git submodule update --remote frontend
+```
+
+若要在子模块内修改并推送到前端仓库：
+
+1. 进入子模块：`cd frontend`
+2. 正常修改、提交并推送到子模块仓库：`git add .` → `git commit -m "..."` → `git push`
+3. 回到主仓根目录：`cd ..`
+4. 提交新的 submodule 指针：`git add frontend` → `git commit -m "chore: update frontend submodule"` → `git push`
+
+---
+
 ## 快速开始
 
 ### 1) 安装依赖

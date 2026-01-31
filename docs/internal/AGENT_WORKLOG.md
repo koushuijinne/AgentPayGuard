@@ -1006,3 +1006,23 @@ pnpm demo:freeze
 ✅ 项目现在具有真正的"零成本AI Agent"能力
 
 **项目当前状态**：🚀 **AI Agent支持多种免费API，零成本可用** 🤖
+
+---
+
+### Phase 22: 再次检测新增文件与子模块 + PM/角色 B 注意事项（2026-01-31）
+
+**背景**：用户要求再次检测项目新增文件（尤其是子模块），并分别说明项目管理者与角色 B 的注意事项。
+
+**执行内容**：
+1. **子模块检测**：确认 `frontend` 子模块（`https://github.com/yoona333/hacker-hackathon-hub.git`）已存在，技术栈为 Vite + React + Tailwind + Reown AppKit + wagmi；多签/冻结合约地址与角色 A 交付一致。
+2. **前端配置不一致**：发现 `frontend/src/lib/web3/config.ts` 中 RPC 为 `https://rpc.kite.testnet`、浏览器为 `https://explorer.kite.testnet`，与主仓及 Kite 官方（`rpc-testnet.gokite.ai`、`testnet.kitescan.ai`）不一致。
+3. **修正**：已将 `frontend/src/lib/web3/config.ts` 中 RPC 与 blockExplorers 改为 Kite 测试网官方地址。
+4. **文档**：新增 `docs/internal/PM_AND_ROLE_B_NOTES.md`，汇总：
+   - 项目管理注意：子模块克隆/更新、前端 RPC/浏览器、前后端接口约定、子模块仓库归属；
+   - 角色 B 注意：EOA/AA Tx Hash 交付、与前端关系、冻结检查、自检与 AGENT_WORKLOG 更新。
+
+**文件变更**：
+- 新增：`docs/internal/PM_AND_ROLE_B_NOTES.md`
+- 修改：`frontend/src/lib/web3/config.ts`（RPC / blockExplorers）
+- 修改：`README.md`（新增「子模块（前端）」：克隆后 `git submodule update --init --recursive`，更新流程 `git submodule update --remote frontend` → frontend 内提交推送 → 主仓提交 submodule 指针）
+- 修改：`docs/internal/AGENT_WORKLOG.md`（本条目）
