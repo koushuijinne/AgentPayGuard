@@ -1,5 +1,13 @@
 import 'dotenv/config';
+import * as envEnc from '@chainlink/env-enc';
 import { z } from 'zod';
+
+// Chainlink env-enc：若存在 .env.enc 且当前会话已 npx env-enc set-pw，则解密并覆盖 process.env
+try {
+  (envEnc as { config?: () => void }).config?.();
+} catch {
+  // 无 .env.enc 或未设密码时仅用 .env
+}
 
 function boolFromEnv(defaultValue: boolean) {
   return z.string().optional().transform((v) => {
