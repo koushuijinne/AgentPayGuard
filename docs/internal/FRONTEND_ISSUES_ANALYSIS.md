@@ -80,7 +80,7 @@
 ## 改进优先级
 
 1. ~~**让 Freeze/Proposals 页面接入真实合约调用**（项目核心卖点——多签风控）~~ **[Done - Phase 31]**
-2. **Pay 页面补全 i18n，语言切换组件放到公共 header**
-3. **抽取公共 Layout 组件**（统一 header/背景/返回按钮逻辑）
-4. **新增策略展示页面或在 Dashboard 展示当前 policy 配置**
-5. **History 页面接入真实链上数据**
+2. ~~**Pay 页面补全 i18n，语言切换组件放到公共 header**~~ **[Done]** Pay 使用 `t()`，Layout 含 LanguageToggle。
+3. ~~**抽取公共 Layout 组件**（统一 header/背景/返回按钮逻辑）~~ **[Done]** `components/Layout.tsx`，Pay/AIPay/Dashboard/Freeze/Proposals/History 已接入。
+4. ~~**新增策略展示页面或在 Dashboard 展示当前 policy 配置**~~ **[Done]** Dashboard 右侧「Policy (API)」卡片，请求 `/api/policy`。
+5. ~~**History 页面接入真实链上数据**~~ **[Done]** History 使用 `useProposals()` 多签链上数据。

@@ -273,6 +273,18 @@ AA 账户需先有足够 **KITE（gas）** 和 **稳定币** 才能成功发起 
 
 ---
 
+## 多签钱包说明（测试网与 Ash Wallet）
+
+当前 **Kite AI 官方推荐的 Ash Wallet** 在测试网环境下**无法选择 Kite AI Testnet**，钱包网络列表中仅提供 Kite AI 主网，没有「Kite AI Testnet」选项，因此无法在测试网上使用 Ash 创建/管理多签。下图为 Ash 钱包网络列表截图（仅见 Kite AI Mainnet，无 Testnet）：
+
+![Ash 钱包网络列表（无 Kite AI Testnet）](docs/assets/ash-wallet-networks.png)
+
+为此，本团队在测试网阶段采用**自建多签方案**（基于 Safe 兼容的合约，2/3 阈值），用于链上冻结、提案与风控演示。
+
+**后续上主网时**，可切换为 Kite 官方推荐的 **Ash Wallet** 进行多签与支付流程。
+
+---
+
 ## 策略说明（AI增强版）
 
 当前实现的策略集：
