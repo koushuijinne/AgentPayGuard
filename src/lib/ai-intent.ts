@@ -211,7 +211,7 @@ Example inputs:
     const addressMatch = userMessage.match(/0x[a-fA-F0-9]{40}/);
     
     const defaultAddress = this.env.RECIPIENT || 'unknown';
-    const defaultAmount = this.env.AMOUNT || '0.01';
+    const defaultAmount = this.env.AMOUNT || '0.001';
     
     return {
       recipient: addressMatch ? addressMatch[0] : defaultAddress,

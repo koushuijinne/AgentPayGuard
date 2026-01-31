@@ -167,6 +167,22 @@ pnpm demo:ai-agent "Pay 10 USDC to 0xd2d45ef2f2ddaffc8c8bc03cedc4f55fb9e97e2b"
 
 输出里会打印 tx hash（把它填到 `for_judge.md` 的占位里）。
 
+### 测试准备（真实发送前必读）
+
+在设置 `EXECUTE_ONCHAIN=1` 做真实链上测试前，请确保钱包有足够测试资产：
+
+| 资产 | 用途 | 建议准备量 |
+|------|------|------------|
+| **KITE（原生代币）** | 支付 gas | 每笔 EOA 转账约 0.01～0.05 KITE；建议先领一次 faucet（约 0.5 KITE），可支撑多笔测试 |
+| **USDT/USDC（稳定币）** | 实际转出金额 | 默认每笔 `AMOUNT=0.001`；做 N 笔测试至少准备 N×0.001（可调大 `.env` 中 `AMOUNT`） |
+
+**获取测试币**：
+
+- **KITE**：打开 [Kite 测试网 Faucet](https://faucet.gokite.ai/)，连接钱包后领取（每地址约 24 小时一次，约 0.5 KITE）。
+- **USDT/USDC**：测试网稳定币需从官方文档或社区获取测试网水龙头/转账方式；合约地址填 `.env` 中的 `SETTLEMENT_TOKEN_ADDRESS`。
+
+**单次测试最低消耗**：约 0.01～0.05 KITE（gas）+ 你设置的 `AMOUNT`（默认 0.001 USDT/USDC）。
+
 ---
 
 ## AI Agent 功能特性

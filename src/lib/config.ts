@@ -21,7 +21,7 @@ export const EnvSchema = z.object({
   SETTLEMENT_TOKEN_ADDRESS: z.string().min(1),
   RECIPIENT: z.string().min(1),
 
-  AMOUNT: z.string().default('0.01'),
+  AMOUNT: z.string().default('0.001'),
   TOKEN_DECIMALS: z.coerce.number().int().min(0).max(255).optional(),
 
   // Policy (human-readable units, will be parsed to token units)
