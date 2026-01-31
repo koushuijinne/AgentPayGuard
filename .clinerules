@@ -5,7 +5,8 @@
 1. ✅ 完整阅读本文件
 2. ✅ 确认理解所有约束
 3. ✅ **特别：禁止读取 `.env*` 文件**
-4. ✅ 使用文末自检清单
+4. ✅ **修改前**：检查主仓/子模块是否在 main，若是则按 README 切到 feature 分支
+5. ✅ 使用文末自检清单
 
 ---
 
@@ -37,6 +38,13 @@
 - ✓ `AGENT_WORKLOG.md` 达 1000 行时，自动精简到 500 行内
 - 保留：Phase 摘要表、当前状态、运行命令、关键文件、附录
 - 精简：各 Phase 描述压缩为 2–4 行要点
+
+### 4c. 修改前检查分支（不污染 main）
+- ✓ **每次修改文件前**，检查主仓和子模块是否在 `main` 分支
+- ✓ 若主仓在 main：`git checkout -b feature/xxx` 切换到新分支
+- ✓ 若子模块在 main：`cd frontend && git checkout -b feature/xxx`
+- ✓ 详见 README.md「主仓 + 子模块都在新分支修改」章节
+- ✗ 不得在 main 分支上直接修改
 
 ### 5. 清晰的 Git 提交
 - ✓ commit 含 Phase 号 + 操作描述（例：`Phase 12: Create TESTING_GUIDE.md`）
@@ -152,4 +160,5 @@
 - [ ] 未新增/修改 `.env*`
 - [ ] commit message 清晰
 - [ ] 本文件未被意外修改
+- [ ] 主仓与子模块均不在 main 分支（否则已按 README 切换）
 - [ ] 重要决定已文档化
