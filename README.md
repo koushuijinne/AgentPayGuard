@@ -167,6 +167,22 @@ pnpm demo:ai-agent "Pay 10 USDC to 0xd2d45ef2f2ddaffc8c8bc03cedc4f55fb9e97e2b"
 
 输出里会打印 tx hash（把它填到 `for_judge.md` 的占位里）。
 
+### 测试准备（真实发送前必读）
+
+在设置 `EXECUTE_ONCHAIN=1` 做真实链上测试前，请确保钱包有足够测试资产：
+
+| 资产 | 用途 | 建议准备量 |
+|------|------|------------|
+| **KITE（原生代币）** | 支付 gas | 每笔 EOA 转账约 0.01～0.05 KITE；建议先领一次 faucet（约 0.5 KITE），可支撑多笔测试 |
+| **USDT/USDC（稳定币）** | 实际转出金额 | 默认每笔 `AMOUNT=0.001`；做 N 笔测试至少准备 N×0.001（可调大 `.env` 中 `AMOUNT`） |
+
+**获取测试币**：
+
+- **KITE**：打开 [Kite 测试网 Faucet](https://faucet.gokite.ai/)，连接钱包后领取（每地址约 24 小时一次，约 0.5 KITE）。
+- **USDT/USDC**：测试网稳定币需从官方文档或社区获取测试网水龙头/转账方式；合约地址填 `.env` 中的 `SETTLEMENT_TOKEN_ADDRESS`。
+
+**单次测试最低消耗**：约 0.01～0.05 KITE（gas）+ 你设置的 `AMOUNT`（默认 0.001 USDT/USDC）。
+
 ---
 
 ## AI Agent 功能特性
@@ -209,6 +225,17 @@ pnpm demo:ai-agent "Pay 50 USDC to 0x... via account abstraction"
 ```
 
 输出会包含 `userOpHash` 与最终状态（用于展示 AA 路径的执行结果）。
+
+### 如何与 AA 账户来回转账
+
+AA 账户地址由你的 **Owner EOA**（`.env` 里 `PRIVATE_KEY` 对应的地址）推导，跑一次 `PAYMENT_MODE=aa pnpm demo:pay` 会在日志里打印 `[AA] AA Account Address: 0x...`，即为你的 AA 账户。
+
+| 方向 | 做法 |
+|------|------|
+| **往 AA 转测试 KITE / USDT** | 用 **EOA 模式**：`.env` 里 `PAYMENT_MODE=eoa`，`RECIPIENT` 和 `ALLOWLIST` 都设为 AA 账户地址，`EXECUTE_ONCHAIN=1`，执行 `pnpm demo:pay`。钱从你的 EOA 转到 AA 账户。 |
+| **从 AA 转回 EOA** | 用 **AA 模式**：`.env` 里 `PAYMENT_MODE=aa`，`RECIPIENT` 设为你的 **Owner EOA 地址**，`ALLOWLIST` 里包含该 EOA 地址，`EXECUTE_ONCHAIN=1`，执行 `pnpm demo:pay`。钱从 AA 账户转回你的 EOA。 |
+
+AA 账户需先有足够 **KITE（gas）** 和 **稳定币** 才能成功发起 AA 转账；若之前 AA 交易 revert，多半是 AA 账户余额不足，按上表先用 EOA 给 AA 充值再试。
 
 ---
 

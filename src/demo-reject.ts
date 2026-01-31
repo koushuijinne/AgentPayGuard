@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { loadEnv } from './lib/config.js';
 import { getTokenDecimals } from './lib/erc20.js';
-import { normalizeAddresses, evaluatePolicy } from './lib/policy.js';
+import { parseAllowlist, evaluatePolicy } from './lib/policy.js';
 import { readSpentToday } from './lib/state.js';
 
 async function main() {
@@ -18,7 +18,7 @@ async function main() {
   const hugeAmount = ethers.parseUnits('1000000', decimals);
   const amount = env.MAX_AMOUNT ? normalAmount : hugeAmount;
 
-  const allowlist = normalizeAddresses(env.ALLOWLIST.split(',').filter(Boolean));
+  const allowlist = parseAllowlist(env.ALLOWLIST);
   const policy = {
     allowlist: allowlist.length ? allowlist : undefined,
     maxAmount: env.MAX_AMOUNT ? ethers.parseUnits(env.MAX_AMOUNT, decimals) : undefined,
