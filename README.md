@@ -196,19 +196,23 @@ pnpm demo:ai-agent "Pay 10 USDC to 0xd2d45ef2f2ddaffc8c8bc03cedc4f55fb9e97e2b"
 
 ### 前端 + API 联调（通过 Web UI 发起支付）
 
-1. **主仓**：在项目根目录启动 API 服务（使用 `.env` 配置）  
+1. **主仓**：在项目根目录启动 API 服务（使用 `.env` 配置）
    ```bash
+   # 方式 1：使用 pnpm（注意：pnpm 可能缓冲输出，看不到启动日志）
    pnpm server
-   ```  
-   默认监听 `http://localhost:3000`，提供 `GET /api/health`、`GET /api/policy`、`POST /api/pay`。
+   
+   # 方式 2：直接运行（推荐，可以看到实时输出）
+   API_PORT=3456 npx tsx src/server.ts
+   ```
+   默认监听 `http://localhost:3456`，提供 `GET /api/health`、`GET /api/policy`、`POST /api/pay`。
 
-2. **前端**：进入子模块并启动开发服务器  
+2. **前端**：进入子模块并启动开发服务器
    ```bash
    cd frontend && npm i && npm run dev
-   ```  
-   开发环境下 `/api` 会代理到主仓 API（3000），打开首页 → **PAY**，填写收款地址、金额，选择 EOA/AA，勾选「真实发链上交易」后提交即可；成功会返回 txHash 与 Kite 浏览器链接。
+   ```
+   开发环境下 `/api` 会代理到主仓 API（3456），打开首页 → **PAY**，填写收款地址、金额，选择 EOA/AA，勾选「真实发链上交易」后提交即可；成功会返回 txHash 与 Kite 浏览器链接。
 
-3. **环境**：主仓 `.env` 可设 `API_PORT=3000`、`CORS_ORIGIN=*`（或前端地址）；前端生产环境可设 `VITE_API_URL` 指向部署的 API 地址。
+3. **环境**：主仓 `.env` 可设 `API_PORT=3456`、`CORS_ORIGIN=*`（或前端地址）；前端生产环境可设 `VITE_API_URL` 指向部署的 API 地址。
 
 ---
 
