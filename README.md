@@ -138,6 +138,17 @@ pnpm i
 - `RECIPIENT`：收款地址
 - （可选）`OPENAI_API_KEY`：OpenAI API密钥，用于AI意图解析和风险评估
 
+**可选：Chainlink env-enc 加密敏感变量**
+
+若希望将 `PRIVATE_KEY` 等敏感项加密存储（避免明文写入 `.env`），可使用 [@chainlink/env-enc](https://www.npmjs.com/package/@chainlink/env-enc)：
+
+1. 本会话设置密码：`npx env-enc set-pw`
+2. 写入变量：`npx env-enc set`（可填 PRIVATE_KEY 等；与 `.env` 同名变量会被 `.env.enc` 覆盖）
+3. 启动前在同一终端已 `set-pw` 时，会优先使用 `.env.enc` 解密后的变量
+4. 查看/删除：`npx env-enc view` | `npx env-enc remove VAR_NAME` | `npx env-enc remove-all`
+
+> 项目已集成 env-enc，存在 `.env.enc` 且当前会话已设置密码时，会自动解密并覆盖 `process.env`。
+
 ### 3) 运行 AI Agent 演示（自然语言接口）
 
 ```bash
