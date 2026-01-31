@@ -4,7 +4,7 @@
 
 ---
 
-### Phase 摘要（1–23）
+### Phase 摘要（1–25）
 
 | Phase | 内容 |
 |-------|------|
@@ -22,6 +22,8 @@
 | 21 | 支持免费 AI API（DeepSeek/Gemini/Ollama） |
 | 22 | 子模块检测、前端 RPC 修正、PM/Role B 文档、README 子模块说明 |
 | 23 | 文档精简 + 自动 push 规则 |
+| 24 | 约束文档精简、SECURITY 合并到 .clinerules |
+| 25 | HUMAN_CONSTRAINTS 新增原则 7（立即提交推送） |
 
 ---
 
@@ -169,6 +171,24 @@
 
 ---
 
+### Phase 24：约束文档精简 + SECURITY 合并（2026-01-31）
+
+- **.clinerules**：384 行 → ~156 行；删除冗余「理由」、压缩各约束；将 SECURITY.md 内容合并入「安全政策」章节
+- **HUMAN_CONSTRAINTS**：145 行 → ~89 行；压缩原则表述、特殊指导改表格
+- **SECURITY.md**：删除；内容已并入 .clinerules
+- **README**：AGENT_CONSTRAINTS + SECURITY 链接合并为 .clinerules
+
+---
+
+### Phase 25：HUMAN_CONSTRAINTS 原则 7（2026-01-31）
+
+- **新增原则 7「立即提交推送」**：每次完成会改变仓库状态的操作后，立即执行 `git add -A`、`git commit`、`git push`；不得遗漏
+- **禁止行为**：补充「违反原则 7」
+- **检查清单**：新增「有文件改动？→ 立即 git add/commit/push」
+- **说明**：HUMAN_CONSTRAINTS 在 .gitignore，不提交仓库
+
+---
+
 ### 当前状态
 
 - **代码**：`pnpm typecheck` / `demo:pay` / `demo:reject` / `demo:freeze` / `demo:ai-agent` 可用
@@ -266,8 +286,8 @@ $env:KITE_API_KEY="api_key_xxx"; python python/kitepass_demo.py
 ### 备注
 
 - 工作记录按时间顺序追加，已发布内容不修改不删除
-- 默认不执行 `git commit`；需用户明确要求才提交
-- `.clinerules` 已配置：每次 commit 后自动 `git push`
+- `.clinerules` 约束 5b：每次 commit 后自动 `git push`
+- `HUMAN_CONSTRAINTS` 原则 7：有文件改动后立即 `git add -A`、`commit`、`push`
 
 ---
 
