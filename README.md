@@ -30,13 +30,13 @@
 | **参考文档** |
 | [ARCHITECTURE.md](docs/reference/ARCHITECTURE.md) | 🏗️ 系统架构与设计决策 |
 | [allocation.md](docs/reference/allocation.md) | 👥 角色分工与交付物清单 |
-| [QUICK_REFERENCE.md](docs/reference/QUICK_REFERENCE.md) | ⚡ 快速参考（命令、地址、Tx Hash）|
+| [PM_AND_ROLE_B_CONSOLIDATED.md](docs/internal/PM_AND_ROLE_B_CONSOLIDATED.md) | ⚡ PM / Role B 规整文档（检查清单、命令、测试、A→B 交付）|
 | [resources/](docs/resources/) | 📚 **原始资源**（赛道规则、官方链接等） |
 | **内部管理** |
 | [FINAL_DELIVERY_CHECKLIST.md](docs/internal/FINAL_DELIVERY_CHECKLIST.md) | ✅ 最终交付清单（角色 A/B/C/D） |
-| [AGENT_WORKLOG.md](docs/internal/AGENT_WORKLOG.md) | 📝 工作日志（Phase 1-20 历史，含AI Agent升级） |
-| [AGENT_CONSTRAINTS.md](docs/internal/AGENT_CONSTRAINTS.md) | 📋 Agent 工作约束（16 条规则） |
-| [SECURITY.md](docs/internal/SECURITY.md) | 🔐 安全政策（.env 保护、代码审查） |
+| [AGENT_WORKLOG.md](docs/internal/AGENT_WORKLOG.md) | 📝 工作日志（Phase 摘要） |
+| [PM_AND_ROLE_B_QUICKREF.md](docs/internal/PM_AND_ROLE_B_QUICKREF.md) | 📋 PM / 角色 B 快速参考（检查清单 + 文档入口） |
+| [.clinerules](.clinerules) | 📋 Agent 工作约束 + 安全政策（16 条规则、.env 保护） |
 
 ---
 
@@ -181,6 +181,27 @@ pnpm demo:ai-agent "Pay 50 USDC to 0x... via account abstraction"
 - **AI风险评估**：`maxRiskScore`（最大风险分数，默认70）
 - **AI自动拒绝**：`autoRejectRiskLevels`（自动拒绝的风险等级，默认["high"]）
 - **链上冻结检查**：实时检查多签冻结状态（强依赖模式）
+
+### 测试用白名单地址（ALLOWLIST）
+
+可使用以下**仅接收、无私钥**的测试地址作为 `ALLOWLIST` 和 `RECIPIENT`。这些地址由 `ethers.Wallet.createRandom()` 随机生成，只保留地址、未保存私钥：
+
+```
+ALLOWLIST=0xA7721cCcbD5CAf2F8555aDe641C4Fd687c9a8B52,0x0CAFCC43997CC0ec4C8ff3aB792b0EC6605a7b5b,0xd63E03B9D8c96fdf7F90301b7b12D81a7488Cf9f,0x1Ba32150D7a3cB16852A70850c9C1325f3192211,0xED60f7af5AA1F7650381243Ec850630E1A368c2E
+```
+
+**单独地址**（可复制到 `RECIPIENT`）：
+- `0xA7721cCcbD5CAf2F8555aDe641C4Fd687c9a8B52`
+- `0x0CAFCC43997CC0ec4C8ff3aB792b0EC6605a7b5b`
+- `0xd63E03B9D8c96fdf7F90301b7b12D81a7488Cf9f`
+- `0x1Ba32150D7a3cB16852A70850c9C1325f3192211`
+- `0xED60f7af5AA1F7650381243Ec850630E1A368c2E`
+
+**说明**：
+- 这些是标准 EVM 地址，可正常接收代币，但**无法从这些地址转出**（无私钥）
+- **查看余额**：在 [Kite 区块浏览器](https://testnet.kitescan.ai/) 搜索地址，可看到 USDC 等代币余额
+- **验证转账成功**：① 用 `demo:pay` 输出的 Tx Hash 在浏览器搜索；② 或打开收款地址页面查看 Token Transfers
+- 适合白名单测试和验证「支付是否到账」
 
 ---
 
