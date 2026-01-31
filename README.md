@@ -77,6 +77,47 @@ git submodule update --remote frontend
 3. 回到主仓根目录：`cd ..`
 4. 提交新的 submodule 指针：`git add frontend` → `git commit -m "chore: update frontend submodule"` → `git push`
 
+### 主仓 + 子模块都在新分支修改（不污染 main）
+
+**目标**：主仓和 frontend 子模块都在各自的 feature 分支上修改，不直接改 main，且都能 push 到远端。
+
+**步骤**：
+
+```bash
+# 1. 主仓：切到新分支（或创建）
+cd AgentPayGuard
+git checkout -b feature/your-feature   # 若已有分支则 checkout 即可
+
+# 2. 子模块：切到新分支
+cd frontend
+git checkout -b feature/your-feature   # 子模块也建同名或对应分支
+# 修改 frontend 代码...
+git add .
+git commit -m "feat: xxx"
+git push origin feature/your-feature   # 先 push 子模块到远端
+
+# 3. 主仓：记录新的子模块指针并 push
+cd ..
+git add frontend
+git commit -m "chore: update frontend submodule to feature/your-feature"
+git push origin feature/your-feature    # push 主仓到远端
+```
+
+**要点**：
+- 主仓和子模块**各自**在 feature 分支上工作，互不污染 main
+- 子模块先 push，主仓再提交 submodule 指针并 push
+- 主仓记录的 submodule 指针指向子模块的**具体 commit**，与子模块所在分支无关
+- 若子模块仓库无对应分支权限，可 fork 后改 `.gitmodules` 的 `url` 指向你的 fork
+
+**一次性检查**：
+```bash
+# 主仓当前分支
+git branch --show-current
+
+# 子模块当前分支
+cd frontend && git branch --show-current && cd ..
+```
+
 ---
 
 ## 快速开始
