@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { loadEnv } from './lib/config.js';
 import { getTokenDecimals, transferErc20 } from './lib/erc20.js';
-import { normalizeAddresses, evaluatePolicy } from './lib/policy.js';
+import { parseAllowlist, evaluatePolicy } from './lib/policy.js';
 import { addSpentToday, readSpentToday } from './lib/state.js';
 import { probeKiteAASdk, sendErc20ViaAA } from './lib/kite-aa.js';
 
@@ -23,7 +23,7 @@ async function main() {
   const decimals = env.TOKEN_DECIMALS ?? (await getTokenDecimals(provider, env.SETTLEMENT_TOKEN_ADDRESS));
   const amount = ethers.parseUnits(env.AMOUNT, decimals);
 
-  const allowlist = normalizeAddresses(env.ALLOWLIST.split(',').filter(Boolean));
+  const allowlist = parseAllowlist(env.ALLOWLIST);
   const policy = {
     allowlist: allowlist.length ? allowlist : undefined,
     maxAmount: env.MAX_AMOUNT ? ethers.parseUnits(env.MAX_AMOUNT, decimals) : undefined,

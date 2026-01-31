@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import { loadEnv } from './lib/config.js';
 import { getTokenDecimals, transferErc20 } from './lib/erc20.js';
 import { AIIntentParser } from './lib/ai-intent.js';
-import { evaluatePolicyWithAI, getAIEnhancedPolicy, prepareAmountForEvaluation } from './lib/policy.js';
+import { parseAllowlist, evaluatePolicyWithAI, getAIEnhancedPolicy, prepareAmountForEvaluation } from './lib/policy.js';
 import { addSpentToday, readSpentToday } from './lib/state.js';
 import { sendErc20ViaAA } from './lib/kite-aa.js';
 
@@ -93,7 +93,7 @@ async function main() {
 
   // Prepare policy with AI enhancements
   const basePolicy = {
-    allowlist: env.ALLOWLIST ? env.ALLOWLIST.split(',').filter(Boolean).map(addr => ethers.getAddress(addr.trim())) : undefined,
+    allowlist: (() => { const a = parseAllowlist(env.ALLOWLIST || ''); return a.length ? a : undefined; })(),
     maxAmount: env.MAX_AMOUNT ? ethers.parseUnits(env.MAX_AMOUNT, tokenDecimals) : undefined,
     dailyLimit: env.DAILY_LIMIT ? ethers.parseUnits(env.DAILY_LIMIT, tokenDecimals) : undefined
   };

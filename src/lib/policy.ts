@@ -35,6 +35,12 @@ export function normalizeAddresses(addrs: string[]): string[] {
     .map((a) => ethers.getAddress(a));
 }
 
+/** 解析 ALLOWLIST 字符串，支持逗号、换行、空格分隔 */
+export function parseAllowlist(raw: string): string[] {
+  if (!raw || !raw.trim()) return [];
+  return normalizeAddresses(raw.split(/[,\s\n]+/).filter(Boolean));
+}
+
 // SimpleFreeze contract ABI (minimal)
 const FREEZE_ABI = ['function isFrozen(address account) view returns (bool)'];
 
