@@ -1,13 +1,22 @@
 /**
  * AgentPayGuard API：供前端调用的支付与策略接口
  * 运行：pnpm server（需 .env 中 EXECUTE_ONCHAIN=1 或请求体 executeOnchain=true 才会真实发链上交易）
+ * 启动时仅加载 dotenv+http，config/policy/run-pay 延后加载，避免进程立即退出。
  */
+import 'dotenv/config';
 import http from 'node:http';
-import { loadEnv } from './lib/config.js';
-import { runPay } from './lib/run-pay.js';
-import { parseAllowlist } from './lib/policy.js';
 
-const PORT = Number(process.env.API_PORT ?? process.env.PORT ?? 3000);
+process.on('uncaughtException', (err) => {
+  console.error('[AgentPayGuard API] uncaughtException:', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason, p) => {
+  console.error('[AgentPayGuard API] unhandledRejection:', reason, p);
+  process.exit(1);
+});
+
+console.error('[AgentPayGuard API] starting...');
+const PORT = Number(process.env.API_PORT ?? process.env.PORT ?? 3001);
 const CORS_ORIGIN = process.env.CORS_ORIGIN ?? '*';
 
 function parseBody(req: http.IncomingMessage): Promise<Record<string, unknown>> {
@@ -52,6 +61,8 @@ const server = http.createServer(async (req, res) => {
 
   if (path === '/api/policy' && req.method === 'GET') {
     try {
+      const { loadEnv } = await import('./lib/config.js');
+      const { parseAllowlist } = await import('./lib/policy.js');
       const env = loadEnv();
       const allowlist = parseAllowlist(env.ALLOWLIST);
       send(res, 200, {
@@ -70,6 +81,7 @@ const server = http.createServer(async (req, res) => {
 
   if (path === '/api/pay' && req.method === 'POST') {
     try {
+      const { runPay } = await import('./lib/run-pay.js');
       const body = await parseBody(req);
       const recipient = typeof body.recipient === 'string' ? body.recipient : undefined;
       const amount = typeof body.amount === 'string' ? body.amount : undefined;
@@ -99,6 +111,22 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (path === '/' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', CORS_ORIGIN);
+    res.writeHead(200);
+    res.end(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>AgentPayGuard API</title></head><body>
+<h1>AgentPayGuard API</h1>
+<p>服务已启动，端口: ${PORT}</p>
+<ul>
+  <li><a href="/api/health">GET /api/health</a> - 健康检查</li>
+  <li><a href="/api/policy">GET /api/policy</a> - 策略（白名单/限额）</li>
+  <li>POST /api/pay - 发起支付（需用前端或 curl 调用）</li>
+</ul>
+</body></html>`);
+    return;
+  }
+
   send(res, 404, { error: 'Not found' });
 });
 
@@ -107,4 +135,12 @@ server.listen(PORT, () => {
   console.log('  GET  /api/health - 健康检查');
   console.log('  GET  /api/policy - 策略（白名单/限额）');
   console.log('  POST /api/pay    - 发起支付（body: recipient?, amount?, paymentMode?, executeOnchain?）');
+});
+
+server.on('error', (err: NodeJS.ErrnoException) => {
+  console.error('[AgentPayGuard API] server error:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`端口 ${PORT} 已被占用，请更换 API_PORT 或关闭占用进程。`);
+  }
+  process.exit(1);
 });
