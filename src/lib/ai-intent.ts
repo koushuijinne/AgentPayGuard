@@ -240,6 +240,106 @@ Example inputs:
   }
 
   /**
+   * Combined method: Parse intent AND assess risk in a single AI call
+   * This is 2-3x faster than calling parsePaymentIntent() + assessRisk() separately
+   */
+  async parseAndAssessRisk(userMessage: string, context?: {
+    historicalPayments?: Array<{recipient: string, amount: number, timestamp: Date}>;
+    walletBalance?: number;
+  }): Promise<{ intent: PaymentIntent; risk: RiskAssessment }> {
+    if (!this.isEnabled() || !this.openai) {
+      const intent = this.fallbackParse(userMessage);
+      const risk = this.fallbackRiskAssessment(intent);
+      return { intent, risk };
+    }
+
+    try {
+      const contextStr = context ? JSON.stringify(context, null, 2) : 'No additional context';
+      
+      const systemPrompt = `You are a payment intent parser and risk assessment AI.
+Parse the natural language payment request AND assess its risk in a single response.
+
+Output JSON with structure:
+{
+  "intent": {
+    "recipient": "0x... or 'unknown'",
+    "amount": "100 USDC",
+    "amountNumber": 100,
+    "currency": "USDC|USDT|ETH|etc",
+    "purpose": "brief description",
+    "confidence": 0.0-1.0,
+    "riskLevel": "low|medium|high",
+    "reasoning": "brief reasoning"
+  },
+  "risk": {
+    "score": 0-100,
+    "level": "low|medium|high",
+    "reasons": ["reason1", "reason2"],
+    "recommendations": ["recommendation1", "recommendation2"]
+  }
+}
+
+Intent parsing rules:
+- If address is not specified, use "unknown"
+- Default currency is USDC unless specified
+- Extract purpose from context
+
+Risk assessment considerations:
+- Amount size relative to typical payments
+- Recipient address format and validity
+- Payment purpose clarity
+- Historical payment patterns (if provided)
+- Wallet balance (if provided)
+
+Example inputs:
+- "Pay 100 USDC to 0x742d35Cc6634C0532925a3b844Bc9e0BB0A8E2D3 for server hosting"
+- "Send 0.5 ETH to my supplier"
+- "Transfer $50 to vendor for office supplies"`;
+
+      const userPrompt = `Payment request: "${userMessage}"
+
+Additional context:
+${contextStr}
+
+Parse the intent and assess the risk.`;
+
+      const completion = await this.openai.chat.completions.create({
+        model: this.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.1,
+        response_format: { type: "json_object" }
+      });
+
+      const content = completion.choices[0]?.message?.content;
+      if (!content) {
+        throw new Error('No response from AI');
+      }
+
+      const parsed = JSON.parse(content);
+      
+      return {
+        intent: {
+          ...parsed.intent,
+          parsedSuccessfully: true,
+          riskLevel: parsed.intent.riskLevel.toLowerCase() as 'low' | 'medium' | 'high'
+        },
+        risk: {
+          ...parsed.risk,
+          level: parsed.risk.level.toLowerCase() as 'low' | 'medium' | 'high'
+        }
+      };
+    } catch (error) {
+      console.error('[AI] Error in combined parse and assess:', error);
+      const intent = this.fallbackParse(userMessage);
+      const risk = this.fallbackRiskAssessment(intent);
+      return { intent, risk };
+    }
+  }
+
+  /**
    * Assess risk of a payment intent
    */
   async assessRisk(intent: PaymentIntent, context?: {
